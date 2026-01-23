@@ -17,6 +17,8 @@
                         <Label
                             Text="{Binding NextTrigger,
                                StringFormat='Next: {0:dd MMM HH:mm}'}" />
+						<Label
+							Text="{Binding Name}" />
                     </Frame>
                 </DataTemplate>
             </CollectionView.ItemTemplate>

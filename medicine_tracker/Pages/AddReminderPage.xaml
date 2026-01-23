@@ -7,6 +7,13 @@
 
     <VerticalStackLayout Padding="20" Spacing="25">
 
+        <Label Text="Reminder name"
+               FontSize="18"
+               FontAttributes="Bold" />
+
+        <Entry x:Name="NameEntry"
+               Placeholder="e.g. Take vitamins" />
+
         <Label Text="Select days"
                FontSize="18"
                FontAttributes="Bold" />

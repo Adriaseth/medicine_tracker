@@ -8,10 +8,13 @@ namespace medicine_tracker.Platforms.Android.Services
 {
 	public static class AlarmScheduler
 	{
-		public static void ScheduleReminder(DateTime time)
+		const string ExtraReminderName = "reminder_name";
+
+		public static void ScheduleReminder(DateTime time, string name)
 		{
 			var context = Application.Context;
 			var intent = new Intent(context, typeof(Receivers.AlarmReceiver));
+			intent.PutExtra(ExtraReminderName, name ?? string.Empty);
 			var pendingIntent = PendingIntent.GetBroadcast(
 				context, 0, intent,
 				PendingIntentFlags.UpdateCurrent | PendingIntentFlags.Immutable);

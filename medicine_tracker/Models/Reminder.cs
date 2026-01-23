@@ -7,6 +7,8 @@ namespace medicine_tracker.Models
 		[PrimaryKey, AutoIncrement]
 		public int Id { get; set; }
 
+		public string Name { get; set; } = string.Empty;
+
 		// Bitmask for days: 0 = none selected → treat as all
 		public int DaysMask { get; set; }
 

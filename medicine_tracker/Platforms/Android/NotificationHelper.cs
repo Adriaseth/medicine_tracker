@@ -9,13 +9,14 @@ namespace medicine_tracker.Platforms.Android
 	{
 		const string CHANNEL_ID = "reminder_channel";
 
-		public static void ShowNotification(Context context)
+		public static void ShowNotification(Context context, string? reminderName = null)
 		{
 			CreateChannel(context);
+			var name = string.IsNullOrWhiteSpace(reminderName) ? "Reminder" : reminderName;
 
 			var builder = new NotificationCompat.Builder(context, CHANNEL_ID)
 				.SetContentTitle("Reminder")
-				.SetContentText("Your test reminder fired!")
+				.SetContentText(name)
 				.SetSmallIcon(Resource.Drawable.dotnet_bot)
 				.SetAutoCancel(true);
 

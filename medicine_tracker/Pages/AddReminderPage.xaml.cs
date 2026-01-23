@@ -70,8 +70,13 @@ public partial class AddReminderPage : ContentPage
 
 		if (time != null)
 		{
+			var name = (NameEntry.Text ?? string.Empty).Trim();
+			if (string.IsNullOrWhiteSpace(name))
+				name = "Reminder";
+
 			var reminder = new Reminder
 			{
+				Name = name,
 				DaysMask = mask,
 				Hour = time.Value.Hours,
 				Minute = time.Value.Minutes
@@ -86,7 +91,7 @@ public partial class AddReminderPage : ContentPage
 
 #if ANDROID
 			// Schedule native Android alarm
-			Platforms.Android.Services.AlarmScheduler.ScheduleReminder(next);
+			Platforms.Android.Services.AlarmScheduler.ScheduleReminder(next, reminder.Name);
 #endif
 
 			// Return to main page
