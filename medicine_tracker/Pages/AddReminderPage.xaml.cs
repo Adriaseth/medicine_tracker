@@ -15,6 +15,7 @@ public partial class AddReminderPage : ContentPage
 		InitializeComponent();
 		_repo = repo;
 		BuildDayButtons();
+		TimePicker.Time = DateTime.Now.TimeOfDay;
 	}
 
 	private void BuildDayButtons()

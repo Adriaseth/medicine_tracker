@@ -16,5 +16,9 @@ namespace medicine_tracker.Models
 
 		// Next scheduled trigger (UTC ticks)
 		public long NextTriggerTicks { get; set; }
+
+		[Ignore]
+		public DateTime NextTrigger =>
+			DateTime.SpecifyKind(new DateTime(NextTriggerTicks), DateTimeKind.Utc).ToLocalTime();
 	}
 }

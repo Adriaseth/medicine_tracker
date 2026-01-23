@@ -15,7 +15,7 @@
                 <DataTemplate>
                     <Frame Padding="10">
                         <Label
-                            Text="{Binding NextTriggerTicks,
+                            Text="{Binding NextTrigger,
                                StringFormat='Next: {0:dd MMM HH:mm}'}" />
                     </Frame>
                 </DataTemplate>
