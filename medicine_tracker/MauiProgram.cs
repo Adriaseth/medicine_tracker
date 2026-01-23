@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using medicine_tracker.Services;
+using Microsoft.Extensions.Logging;
 
 namespace medicine_tracker
 {
@@ -19,7 +20,11 @@ namespace medicine_tracker
     		builder.Logging.AddDebug();
 #endif
 
-            return builder.Build();
+			builder.Services.AddSingleton<MainPage>();
+			builder.Services.AddSingleton<ReminderRepository>();
+			builder.Services.AddSingleton<App>();
+
+			return builder.Build();
         }
     }
 }

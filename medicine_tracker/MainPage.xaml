@@ -1,19 +1,27 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="medicine_tracker.MainPage">
+﻿<?xml version="1.0" encoding="utf-8"?>
 
-    <ScrollView>
-        <VerticalStackLayout Padding="30" Spacing="20">
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="medicine_tracker.MainPage">
 
-            <Label Text="Test Reminder"
-                   FontSize="22"
-                   HorizontalOptions="Center" />
+    <VerticalStackLayout Padding="20" Spacing="15">
 
-            <Button Text="Schedule reminder in 1 minute"
-                    Clicked="OnScheduleClicked" />
+        <Button Text="➕ Add Reminder"
+                Clicked="OnAddClicked" />
 
-        </VerticalStackLayout>
-    </ScrollView>
+        <CollectionView x:Name="RemindersList">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Frame Padding="10">
+                        <Label
+                            Text="{Binding NextTriggerTicks,
+                               StringFormat='Next: {0:dd MMM HH:mm}'}" />
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+    </VerticalStackLayout>
 
 </ContentPage>

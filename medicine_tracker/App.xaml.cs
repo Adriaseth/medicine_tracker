@@ -1,17 +1,16 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-
-namespace medicine_tracker
+﻿namespace medicine_tracker
 {
-    public partial class App : Application
-    {
-        public App()
-        {
-            InitializeComponent();
-        }
+	public partial class App : Application
+	{
+		public App(MainPage page)
+		{
+			InitializeComponent();
+			MainPage = new NavigationPage(page);
+		}
 
-        protected override Window CreateWindow(IActivationState? activationState)
-        {
-            return new Window(new AppShell());
-        }
-    }
+		protected override Window CreateWindow(IActivationState? activationState)
+		{
+			return new Window(new AppShell());
+		}
+	}
 }

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="medicine_tracker.Pages.AddReminderPage">
+
+    <VerticalStackLayout Padding="20" Spacing="25">
+
+        <Label Text="Select days"
+               FontSize="18"
+               FontAttributes="Bold" />
+
+        <!-- Day buttons injected from code-behind -->
+        <HorizontalStackLayout x:Name="DaysRow"
+                               Spacing="8" />
+
+        <Label Text="Select time"
+               FontSize="18"
+               FontAttributes="Bold" />
+
+        <TimePicker x:Name="TimePicker"
+                    Format="HH:mm" />
+
+        <Button Text="Save Reminder"
+                Clicked="OnSaveClicked" />
+
+    </VerticalStackLayout>
+
+</ContentPage>
