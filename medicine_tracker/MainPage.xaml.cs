@@ -55,5 +55,11 @@ namespace medicine_tracker
 		{
 			await Navigation.PushAsync(new AddReminderPage(_repo));
 		}
+
+		void OnToggleThemeClicked(object sender, EventArgs e)
+		{
+			var current = Application.Current?.UserAppTheme ?? AppTheme.Unspecified;
+			Application.Current!.UserAppTheme = current == AppTheme.Dark ? AppTheme.Light : AppTheme.Dark;
+		}
 	}
 }

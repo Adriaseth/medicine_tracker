@@ -5,25 +5,93 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     x:Class="medicine_tracker.MainPage">
 
-    <VerticalStackLayout Padding="20" Spacing="15">
+	<Grid
+		RowDefinitions="Auto,*">
 
-        <Button Text="➕ Add Reminder"
-                Clicked="OnAddClicked" />
+		<!-- Header -->
+		<Grid Padding="20,18,20,10" ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto" RowSpacing="6">
+			<Label
+				Text="Medicine"
+				FontSize="28"
+				FontAttributes="Bold" />
+			<Button
+				Grid.Column="1"
+				Text="Theme"
+				Clicked="OnToggleThemeClicked"
+				Padding="12,8"
+				CornerRadius="12"
+				BackgroundColor="{AppThemeBinding Light=#DCFCE7, Dark=#212121}"
+				TextColor="{AppThemeBinding Light=#166534, Dark=#FFFFFF}" />
+			<Label Text="Your upcoming reminders"
+				Grid.Row="1"
+				TextColor="{AppThemeBinding Light=#6E6E6E, Dark=#ACACAC}"
+				FontSize="14" />
+		</Grid>
 
-        <CollectionView x:Name="RemindersList">
-            <CollectionView.ItemTemplate>
-                <DataTemplate>
-                    <Frame Padding="10">
-                        <Label
-                            Text="{Binding NextTrigger,
-                               StringFormat='Next: {0:dd MMM HH:mm}'}" />
-						<Label
-							Text="{Binding Name}" />
-                    </Frame>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
+		<!-- Content -->
+		<Grid Grid.Row="1">
+			<CollectionView
+				x:Name="RemindersList"
+				Margin="20,0"
+				SelectionMode="None">
+				<CollectionView.ItemTemplate>
+					<DataTemplate>
+						<Frame
+							Padding="14"
+							Margin="0,0,0,12"
+							CornerRadius="16"
+							HasShadow="False"
+							BorderColor="{AppThemeBinding Light=#C8C8C8, Dark=#404040}"
+							BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#111827}">
+							<Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto" ColumnSpacing="12">
+								<Frame
+									Grid.RowSpan="2"
+									Padding="0"
+									WidthRequest="44"
+									HeightRequest="44"
+									CornerRadius="12"
+									HasShadow="False"
+									BackgroundColor="{AppThemeBinding Light=#DCFCE7, Dark=#15803D}">
+									<Label
+										Text="💊"
+										HorizontalOptions="Center"
+										VerticalOptions="Center"
+										FontSize="18" />
+								</Frame>
 
-    </VerticalStackLayout>
+								<Label
+									Grid.Column="1"
+									Text="{Binding Name}"
+									FontAttributes="Bold"
+									FontSize="16"
+									LineBreakMode="TailTruncation" />
+								<Label
+									Grid.Row="1"
+									Grid.Column="1"
+									Text="{Binding NextTrigger, StringFormat='Next: {0:dd MMM HH:mm}'}"
+									TextColor="{AppThemeBinding Light=#404040, Dark=#ACACAC}"
+									FontSize="13" />
+							</Grid>
+						</Frame>
+					</DataTemplate>
+				</CollectionView.ItemTemplate>
+			</CollectionView>
+
+			<!-- Floating action button -->
+			<Button
+				Text="+"
+				Clicked="OnAddClicked"
+				WidthRequest="56"
+				HeightRequest="56"
+				CornerRadius="16"
+				FontSize="26"
+				Padding="0"
+				BackgroundColor="#16A34A"
+				TextColor="White"
+				HorizontalOptions="End"
+				VerticalOptions="End"
+				Margin="0,0,20,20" />
+		</Grid>
+	</Grid>
 
 </ContentPage>

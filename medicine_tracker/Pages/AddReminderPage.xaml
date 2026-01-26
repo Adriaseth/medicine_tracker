@@ -5,33 +5,69 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     x:Class="medicine_tracker.Pages.AddReminderPage">
 
-    <VerticalStackLayout Padding="20" Spacing="25">
+	<ScrollView
+		BackgroundColor="{AppThemeBinding Light={StaticResource PageBackgroundLight}, Dark={StaticResource PageBackgroundDark}}">
+		<VerticalStackLayout Padding="20" Spacing="14">
+			<Label
+				Text="New reminder"
+				FontSize="24"
+				FontAttributes="Bold" />
+			<Label
+				Text="Set a name, pick days, and choose a time."
+				TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}"
+				FontSize="14" />
 
-        <Label Text="Reminder name"
-               FontSize="18"
-               FontAttributes="Bold" />
+			<Frame
+				Padding="16"
+				CornerRadius="16"
+				HasShadow="False"
+				BorderColor="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}"
+				BackgroundColor="{AppThemeBinding Light={StaticResource CardBackgroundLight}, Dark={StaticResource CardBackgroundDark}}">
+				<VerticalStackLayout Spacing="12">
+					<Label Text="Name" FontAttributes="Bold" />
+					<Entry
+						x:Name="NameEntry"
+						Placeholder="e.g. Take vitamins" />
+				</VerticalStackLayout>
+			</Frame>
 
-        <Entry x:Name="NameEntry"
-               Placeholder="e.g. Take vitamins" />
+			<Frame
+				Padding="16"
+				CornerRadius="16"
+				HasShadow="False"
+				BorderColor="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}"
+				BackgroundColor="{AppThemeBinding Light={StaticResource CardBackgroundLight}, Dark={StaticResource CardBackgroundDark}}">
+				<VerticalStackLayout Spacing="12">
+					<Label Text="Days" FontAttributes="Bold" />
+					<!-- Day buttons injected from code-behind -->
+					<HorizontalStackLayout x:Name="DaysRow" Spacing="8" />
+					<Label
+						Text="Tip: leave all unselected for every day"
+						FontSize="12"
+						TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}" />
+				</VerticalStackLayout>
+			</Frame>
 
-        <Label Text="Select days"
-               FontSize="18"
-               FontAttributes="Bold" />
+			<Frame
+				Padding="16"
+				CornerRadius="16"
+				HasShadow="False"
+				BorderColor="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}"
+				BackgroundColor="{AppThemeBinding Light={StaticResource CardBackgroundLight}, Dark={StaticResource CardBackgroundDark}}">
+				<VerticalStackLayout Spacing="12">
+					<Label Text="Time" FontAttributes="Bold" />
+					<TimePicker x:Name="TimePicker" Format="HH:mm" />
+				</VerticalStackLayout>
+			</Frame>
 
-        <!-- Day buttons injected from code-behind -->
-        <HorizontalStackLayout x:Name="DaysRow"
-                               Spacing="8" />
-
-        <Label Text="Select time"
-               FontSize="18"
-               FontAttributes="Bold" />
-
-        <TimePicker x:Name="TimePicker"
-                    Format="HH:mm" />
-
-        <Button Text="Save Reminder"
-                Clicked="OnSaveClicked" />
-
-    </VerticalStackLayout>
+			<Button
+				Text="Save"
+				Clicked="OnSaveClicked"
+				BackgroundColor="{StaticResource Primary}"
+				TextColor="White"
+				CornerRadius="14"
+				HeightRequest="52" />
+		</VerticalStackLayout>
+	</ScrollView>
 
 </ContentPage>
