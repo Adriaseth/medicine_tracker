@@ -72,7 +72,11 @@ public partial class AddReminderPage : ContentPage
 		{
 			var name = (NameEntry.Text ?? string.Empty).Trim();
 			if (string.IsNullOrWhiteSpace(name))
-				name = "Reminder";
+			{
+				await DisplayAlert("Missing name", "Please enter a reminder name.", "OK");
+				NameEntry.Focus();
+				return;
+			}
 
 			var reminder = new Reminder
 			{
@@ -84,14 +88,16 @@ public partial class AddReminderPage : ContentPage
 
 			// Compute first upcoming trigger
 			var next = ReminderScheduler.ComputeNextTrigger(reminder);
-			reminder.NextTriggerTicks = next.Ticks;
+			reminder.NextTriggerTicks = next.ToUniversalTime().Ticks;
+			reminder.IsScheduled = false;
 
 			// Save to SQLite
 			await _repo.Add(reminder);
 
 #if ANDROID
 			// Schedule native Android alarm
-			Platforms.Android.Services.AlarmScheduler.ScheduleReminder(next, reminder.Name);
+			if (Platforms.Android.Services.AlarmScheduler.TryScheduleReminder(reminder.Id, next, reminder.Name))
+				await _repo.UpdateIsScheduled(reminder.Id, true);
 #endif
 
 			// Return to main page

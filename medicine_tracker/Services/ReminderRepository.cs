@@ -11,6 +11,7 @@ namespace medicine_tracker.Services
 		static readonly IMigration[] Migrations =
 		[
 			new Migration001_AddReminderName(),
+			new Migration002_AddReminderIsScheduled(),
 		];
 
 		async Task Init()
@@ -23,6 +24,8 @@ namespace medicine_tracker.Services
 
 			_db = new SQLiteAsyncConnection(path);
 			await ApplyMigrations();
+			// Safety net: ensure table exists even if the DB is new/partial.
+			await _db.CreateTableAsync<Reminder>();
 		}
 
 		async Task ApplyMigrations()
@@ -42,10 +45,41 @@ namespace medicine_tracker.Services
 			return await _db.Table<Reminder>().ToListAsync();
 		}
 
+		public async Task<Reminder?> GetById(int id)
+		{
+			await Init();
+			return await _db.Table<Reminder>().Where(r => r.Id == id).FirstOrDefaultAsync();
+		}
+
 		public async Task Add(Reminder r)
 		{
 			await Init();
 			await _db.InsertAsync(r);
+		}
+
+		public async Task UpdateIsScheduled(int id, bool isScheduled)
+		{
+			await Init();
+			await _db.ExecuteAsync(
+				"UPDATE Reminder SET IsScheduled = ? WHERE Id = ?",
+				isScheduled ? 1 : 0,
+				id);
+		}
+
+		public async Task Update(Reminder r)
+		{
+			await Init();
+			await _db.UpdateAsync(r);
+		}
+
+		public async Task UpdateNextTrigger(int id, DateTime nextTriggerLocal)
+		{
+			await Init();
+			var nextUtcTicks = nextTriggerLocal.ToUniversalTime().Ticks; // Ensure UTC ticks are stored
+			await _db.ExecuteAsync(
+				"UPDATE Reminder SET NextTriggerTicks = ? WHERE Id = ?",
+				nextUtcTicks,
+				id);
 		}
 	}
 }

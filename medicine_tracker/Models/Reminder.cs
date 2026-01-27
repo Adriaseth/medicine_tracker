@@ -19,6 +19,9 @@ namespace medicine_tracker.Models
 		// Next scheduled trigger (UTC ticks)
 		public long NextTriggerTicks { get; set; }
 
+		// Whether an alarm has been scheduled for NextTriggerTicks
+		public bool IsScheduled { get; set; }
+
 		[Ignore]
 		public DateTime NextTrigger =>
 			DateTime.SpecifyKind(new DateTime(NextTriggerTicks), DateTimeKind.Utc).ToLocalTime();

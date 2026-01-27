@@ -27,10 +27,45 @@ namespace medicine_tracker
 
 #if ANDROID
 			RequestNotificationPermissionAndroid();
+			try
+			{
+				await EnsureAlarmsScheduledAndroid();
+			}
+			catch
+			{
+				// If DB isn't initialized yet, avoid crashing on startup.
+			}
 #endif
 
-			RemindersList.ItemsSource = await _repo.GetAll();
+			try
+			{
+				RemindersList.ItemsSource = await _repo.GetAll();
+			}
+			catch
+			{
+				RemindersList.ItemsSource = Array.Empty<Models.Reminder>();
+			}
 		}
+
+#if ANDROID
+		bool _alarmsEnsured;
+
+		async Task EnsureAlarmsScheduledAndroid()
+		{
+			if (_alarmsEnsured)
+				return;
+			_alarmsEnsured = true;
+
+			var reminders = await _repo.GetAll();
+			foreach (var reminder in reminders)
+			{
+				var next = Services.ReminderScheduler.ComputeNextTrigger(reminder);
+				await _repo.UpdateNextTrigger(reminder.Id, next);
+				if (Platforms.Android.Services.AlarmScheduler.TryScheduleReminder(reminder.Id, next, reminder.Name))
+					await _repo.UpdateIsScheduled(reminder.Id, true);
+			}
+		}
+#endif
 
 #if ANDROID
 		void RequestNotificationPermissionAndroid()
@@ -53,6 +88,17 @@ namespace medicine_tracker
 
 		async void OnAddClicked(object sender, EventArgs e)
 		{
+		#if ANDROID
+			var context = global::Android.App.Application.Context;
+			if (!Platforms.Android.Services.AlarmScheduler.EnsureExactAlarmPermission(context))
+			{
+				await DisplayAlert(
+					"Allow exact alarms",
+					"To schedule reminders precisely, enable 'Alarms & reminders' for this app. After enabling it, tap + again.",
+					"OK");
+				return;
+			}
+		#endif
 			await Navigation.PushAsync(new AddReminderPage(_repo));
 		}
 
