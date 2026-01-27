@@ -12,6 +12,7 @@ namespace medicine_tracker.Services
 		[
 			new Migration001_AddReminderName(),
 			new Migration002_AddReminderIsScheduled(),
+			new Migration003_AddReminderSmartFields(),
 		];
 
 		async Task Init()
@@ -79,6 +80,30 @@ namespace medicine_tracker.Services
 			await _db.ExecuteAsync(
 				"UPDATE Reminder SET NextTriggerTicks = ? WHERE Id = ?",
 				nextUtcTicks,
+				id);
+		}
+
+		public async Task ResetSmartState(int id)
+		{
+			await Init();
+			await _db.ExecuteAsync(
+				"UPDATE Reminder SET IsTaken = 0, FollowUpCount = 0 WHERE Id = ?",
+				id);
+		}
+
+		public async Task MarkTaken(int id)
+		{
+			await Init();
+			await _db.ExecuteAsync(
+				"UPDATE Reminder SET IsTaken = 1, FollowUpCount = 0 WHERE Id = ?",
+				id);
+		}
+
+		public async Task IncrementFollowUp(int id)
+		{
+			await Init();
+			await _db.ExecuteAsync(
+				"UPDATE Reminder SET FollowUpCount = FollowUpCount + 1 WHERE Id = ?",
 				id);
 		}
 	}

@@ -1,5 +1,6 @@
 ﻿using medicine_tracker.Pages;
 using medicine_tracker.Services;
+using System.Linq;
 
 #if ANDROID
 using Android.OS;
@@ -14,6 +15,7 @@ namespace medicine_tracker
 	public partial class MainPage : ContentPage
 	{
 		readonly ReminderRepository _repo;
+		bool _resumeRefreshAttached;
 
 		public MainPage(ReminderRepository repo)
 		{
@@ -24,6 +26,7 @@ namespace medicine_tracker
 		protected override async void OnAppearing()
 		{
 			base.OnAppearing();
+			AttachResumeRefresh();
 
 #if ANDROID
 			RequestNotificationPermissionAndroid();
@@ -45,6 +48,30 @@ namespace medicine_tracker
 			{
 				RemindersList.ItemsSource = Array.Empty<Models.Reminder>();
 			}
+		}
+
+		void AttachResumeRefresh()
+		{
+			if (_resumeRefreshAttached)
+				return;
+			_resumeRefreshAttached = true;
+
+			// MAUI doesn't expose Application.Resumed. Use the Window lifecycle event instead.
+			var window = Application.Current?.Windows.FirstOrDefault();
+			if (window == null)
+				return;
+
+			window.Resumed += async (_, __) =>
+			{
+				try
+				{
+					RemindersList.ItemsSource = await _repo.GetAll();
+				}
+				catch
+				{
+					RemindersList.ItemsSource = Array.Empty<Models.Reminder>();
+				}
+			};
 		}
 
 #if ANDROID

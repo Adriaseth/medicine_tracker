@@ -16,7 +16,7 @@ namespace medicine_tracker.Platforms.Android.Receivers
 			var name = intent.GetStringExtra(AlarmScheduler.ExtraReminderName);
 			Log.Info("AlarmReceiver", $"Received alarm. reminderId={reminderId}, name='{name}'");
 
-			NotificationHelper.ShowNotification(context, name);
+			NotificationHelper.ShowNotification(context, reminderId, name);
 
 			if (reminderId <= 0)
 				return;
@@ -31,9 +31,19 @@ namespace medicine_tracker.Platforms.Android.Receivers
 				if (reminder == null)
 					return;
 
+				// If not taken yet, schedule a follow-up in 10 minutes.
+				if (!reminder.IsTaken)
+				{
+					await repo.IncrementFollowUp(reminderId);
+					var followUp = DateTime.Now.AddMinutes(10);
+					AlarmScheduler.ScheduleReminder(reminderId, followUp, reminder.Name);
+					return;
+				}
+
+				// Taken: schedule the next regular dose.
+				await repo.ResetSmartState(reminderId);
 				var next = medicine_tracker.Services.ReminderScheduler.ComputeNextTrigger(reminder);
 				await repo.UpdateNextTrigger(reminderId, next);
-
 				AlarmScheduler.ScheduleReminder(reminderId, next, reminder.Name);
 			}
 			catch

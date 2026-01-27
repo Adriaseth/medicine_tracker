@@ -22,6 +22,13 @@ namespace medicine_tracker.Models
 		// Whether an alarm has been scheduled for NextTriggerTicks
 		public bool IsScheduled { get; set; }
 
+		// Whether the currently due dose has been acknowledged via notification action.
+		// When false, the app will send a reminder notification every 10 minutes.
+		public bool IsTaken { get; set; }
+
+		// Number of 10-minute follow-up reminders sent for the current due dose.
+		public int FollowUpCount { get; set; }
+
 		[Ignore]
 		public DateTime NextTrigger =>
 			DateTime.SpecifyKind(new DateTime(NextTriggerTicks), DateTimeKind.Utc).ToLocalTime();

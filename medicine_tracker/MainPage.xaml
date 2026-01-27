@@ -43,6 +43,12 @@
 							HasShadow="False"
 							BorderColor="{AppThemeBinding Light=#C8C8C8, Dark=#404040}"
 							BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#111827}">
+							<Frame.Triggers>
+								<DataTrigger TargetType="Frame" Binding="{Binding IsTaken}" Value="True">
+									<Setter Property="BorderColor" Value="#16A34A" />
+									<Setter Property="BackgroundColor" Value="#DCFCE7" />
+								</DataTrigger>
+							</Frame.Triggers>
 							<Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto" ColumnSpacing="12">
 								<Frame
 									Grid.RowSpan="2"

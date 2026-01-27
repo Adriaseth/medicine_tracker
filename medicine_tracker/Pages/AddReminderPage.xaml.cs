@@ -83,7 +83,9 @@ public partial class AddReminderPage : ContentPage
 				Name = name,
 				DaysMask = mask,
 				Hour = time.Value.Hours,
-				Minute = time.Value.Minutes
+				Minute = time.Value.Minutes,
+				IsTaken = false,
+				FollowUpCount = 0
 			};
 
 			// Compute first upcoming trigger
