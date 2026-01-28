@@ -1,5 +1,6 @@
 using Android.Content;
 using Android.Util;
+using AndroidX.Core.App;
 using Microsoft.Maui;
 using medicine_tracker.Services;
 using medicine_tracker.Platforms.Android.Services;
@@ -20,6 +21,16 @@ public class NotificationActionReceiver : BroadcastReceiver
 		Log.Info("NotificationAction", $"TAKEN clicked. reminderId={reminderId}");
 		if (reminderId <= 0)
 			return;
+
+		// Dismiss the current notification.
+		try
+		{
+			NotificationManagerCompat.From(context).Cancel(reminderId);
+		}
+		catch
+		{
+			// best effort
+		}
 
 		try
 		{

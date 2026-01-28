@@ -1,5 +1,6 @@
 ﻿using Android.App;
 using Android.Content;
+using Android.Media;
 using Android.OS;
 using AndroidX.Core.App;
 
@@ -7,7 +8,9 @@ namespace medicine_tracker.Platforms.Android
 {
 	public static class NotificationHelper
 	{
-		const string CHANNEL_ID = "reminder_channel";
+		// Bump channel id when changing channel settings (Android won't apply changes to an existing channel).
+		const string CHANNEL_ID = "reminder_channel_v2";
+		const string CHANNEL_SOUND_NAME = "bottle_shake";
 
 		public static void ShowNotification(Context context, int reminderId, string? reminderName = null)
 		{
@@ -43,6 +46,14 @@ namespace medicine_tracker.Platforms.Android
 				CHANNEL_ID,
 				"Reminders",
 				NotificationImportance.High);
+
+			// Custom notification sound: Platforms/Android/Resources/raw/bottle_shake.*
+			var soundUri = global::Android.Net.Uri.Parse($"android.resource://{context.PackageName}/raw/{CHANNEL_SOUND_NAME}");
+			var attributes = new AudioAttributes.Builder()
+				.SetUsage(AudioUsageKind.Notification)
+				.SetContentType(AudioContentType.Sonification)
+				.Build();
+			channel.SetSound(soundUri, attributes);
 
 			var manager = (NotificationManager)context.GetSystemService(Context.NotificationService);
 			manager.CreateNotificationChannel(channel);

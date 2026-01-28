@@ -16,6 +16,7 @@ namespace medicine_tracker
 	{
 		readonly ReminderRepository _repo;
 		bool _resumeRefreshAttached;
+		bool _timerRunning;
 
 		public MainPage(ReminderRepository repo)
 		{
@@ -27,6 +28,7 @@ namespace medicine_tracker
 		{
 			base.OnAppearing();
 			AttachResumeRefresh();
+			StartRefreshTimer();
 
 #if ANDROID
 			RequestNotificationPermissionAndroid();
@@ -40,6 +42,17 @@ namespace medicine_tracker
 			}
 #endif
 
+			await RefreshRemindersAsync();
+		}
+
+		protected override void OnDisappearing()
+		{
+			base.OnDisappearing();
+			_timerRunning = false;
+		}
+
+		async Task RefreshRemindersAsync()
+		{
 			try
 			{
 				RemindersList.ItemsSource = await _repo.GetAll();
@@ -63,15 +76,24 @@ namespace medicine_tracker
 
 			window.Resumed += async (_, __) =>
 			{
-				try
-				{
-					RemindersList.ItemsSource = await _repo.GetAll();
-				}
-				catch
-				{
-					RemindersList.ItemsSource = Array.Empty<Models.Reminder>();
-				}
+				await RefreshRemindersAsync();
 			};
+		}
+
+		void StartRefreshTimer()
+		{
+			if (_timerRunning)
+				return;
+			_timerRunning = true;
+
+			Dispatcher.StartTimer(TimeSpan.FromSeconds(2), () =>
+			{
+				if (!_timerRunning)
+					return false;
+
+				_ = RefreshRemindersAsync();
+				return true;
+			});
 		}
 
 #if ANDROID
