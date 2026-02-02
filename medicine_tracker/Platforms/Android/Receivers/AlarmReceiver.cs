@@ -1,4 +1,5 @@
-﻿using Android.Content;
+﻿using System;
+using Android.Content;
 using Android.Util;
 using Microsoft.Maui;
 using medicine_tracker.Platforms.Android.Services;
@@ -14,6 +15,7 @@ namespace medicine_tracker.Platforms.Android.Receivers
 		{
 			var reminderId = intent.GetIntExtra(AlarmScheduler.ExtraReminderId, 0);
 			var name = intent.GetStringExtra(AlarmScheduler.ExtraReminderName);
+			var alarmKind = intent.GetStringExtra(AlarmScheduler.ExtraAlarmKind) ?? "";
 			Log.Info("AlarmReceiver", $"Received alarm. reminderId={reminderId}, name='{name}'");
 
 			NotificationHelper.ShowNotification(context, reminderId, name);
@@ -32,19 +34,22 @@ namespace medicine_tracker.Platforms.Android.Receivers
 					return;
 
 				// If not taken yet, schedule a follow-up in 10 minutes.
+				// Swiping the notification away does NOT mean taken.
+				// The next regular occurrence is only scheduled when the user marks it as taken.
 				if (!reminder.IsTaken)
 				{
 					await repo.IncrementFollowUp(reminderId);
-					var followUp = DateTime.Now.AddMinutes(10);
-					AlarmScheduler.ScheduleReminder(reminderId, followUp, reminder.Name);
+					// Avoid scheduling multiple follow-ups for a single follow-up trigger.
+					if (alarmKind != "follow_up")
+					{
+						var followUp = DateTime.Now.AddMinutes(10);
+						AlarmScheduler.ScheduleFollowUp(reminderId, followUp, reminder.Name);
+					}
 					return;
 				}
 
-				// Taken: schedule the next regular dose.
-				await repo.ResetSmartState(reminderId);
-				var next = medicine_tracker.Services.ReminderScheduler.ComputeNextTrigger(reminder);
-				await repo.UpdateNextTrigger(reminderId, next);
-				AlarmScheduler.ScheduleReminder(reminderId, next, reminder.Name);
+				// If taken is already set, do nothing here.
+				// Scheduling the next regular occurrence is handled by the Taken action.
 			}
 			catch
 			{

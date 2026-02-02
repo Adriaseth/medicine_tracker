@@ -55,12 +55,75 @@ namespace medicine_tracker
 		{
 			try
 			{
-				RemindersList.ItemsSource = await _repo.GetAll();
+				var reminders = await _repo.GetAll();
+				var today = DateTime.Now.Date;
+				foreach (var r in reminders)
+				{
+					// Keep it green after being taken until the day it becomes due again.
+					// Once we reach the next trigger date, reset IsTaken so the reminder shows as pending.
+					var nextLocal = r.NextTrigger;
+					if (r.IsTaken && today >= nextLocal.Date)
+					{
+						r.IsTaken = false;
+						r.FollowUpCount = 0;
+						await _repo.Update(r);
+					}
+				}
+				RemindersList.ItemsSource = reminders;
 			}
 			catch
 			{
 				RemindersList.ItemsSource = Array.Empty<Models.Reminder>();
 			}
+		}
+
+		async void OnReminderTapped(object sender, TappedEventArgs e)
+		{
+			if (e.Parameter is not Models.Reminder reminder)
+				return;
+
+			if (reminder.IsTaken)
+				return;
+
+			await _repo.MarkTaken(reminder.Id);
+
+			// Schedule the next regular reminder time.
+			var refreshed = await _repo.GetById(reminder.Id);
+			if (refreshed != null)
+			{
+				var next = Services.ReminderScheduler.ComputeNextTrigger(refreshed);
+				await _repo.UpdateNextTrigger(refreshed.Id, next);
+
+#if ANDROID
+				Platforms.Android.Services.AlarmScheduler.CancelAllForReminder(refreshed.Id);
+				Platforms.Android.Services.AlarmScheduler.ScheduleReminder(refreshed.Id, next, refreshed.Name);
+#endif
+			}
+
+			await RefreshRemindersAsync();
+		}
+
+		async void OnDeleteInvoked(object sender, EventArgs e)
+		{
+			if (sender is not SwipeItem swipeItem)
+				return;
+			if (swipeItem.CommandParameter is not Models.Reminder reminder)
+				return;
+
+			var ok = await DisplayAlert(
+				"Delete reminder",
+				$"Delete '{reminder.Name}'?",
+				"Delete",
+				"Cancel");
+			if (!ok)
+				return;
+
+#if ANDROID
+			Platforms.Android.Services.AlarmScheduler.CancelReminder(reminder.Id);
+#endif
+
+			await _repo.Delete(reminder.Id);
+			await RefreshRemindersAsync();
 		}
 
 		void AttachResumeRefresh()
@@ -108,6 +171,16 @@ namespace medicine_tracker
 			var reminders = await _repo.GetAll();
 			foreach (var reminder in reminders)
 			{
+				// If the reminder is currently awaiting confirmation (not taken) and already due,
+				// keep the nag cycle going instead of overwriting with the next regular occurrence.
+				var nextDue = reminder.NextTrigger;
+				if (!reminder.IsTaken && DateTime.Now >= nextDue)
+				{
+					var followUp = DateTime.Now.AddMinutes(10);
+					Platforms.Android.Services.AlarmScheduler.ScheduleFollowUp(reminder.Id, followUp, reminder.Name);
+					continue;
+				}
+
 				var next = Services.ReminderScheduler.ComputeNextTrigger(reminder);
 				await _repo.UpdateNextTrigger(reminder.Id, next);
 				if (Platforms.Android.Services.AlarmScheduler.TryScheduleReminder(reminder.Id, next, reminder.Name))
@@ -154,7 +227,9 @@ namespace medicine_tracker
 		void OnToggleThemeClicked(object sender, EventArgs e)
 		{
 			var current = Application.Current?.UserAppTheme ?? AppTheme.Unspecified;
-			Application.Current!.UserAppTheme = current == AppTheme.Dark ? AppTheme.Light : AppTheme.Dark;
+			var next = current == AppTheme.Dark ? AppTheme.Light : AppTheme.Dark;
+			Application.Current!.UserAppTheme = next;
+			App.SaveTheme(next);
 		}
 	}
 }

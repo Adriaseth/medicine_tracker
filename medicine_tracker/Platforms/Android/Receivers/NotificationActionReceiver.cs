@@ -48,6 +48,8 @@ public class NotificationActionReceiver : BroadcastReceiver
 			var next = ReminderScheduler.ComputeNextTrigger(reminder);
 			await repo.UpdateNextTrigger(reminderId, next);
 			await repo.UpdateIsScheduled(reminderId, true);
+			// Cancel any pending alarms (regular/follow-up) before scheduling next occurrence.
+			AlarmScheduler.CancelAllForReminder(reminderId);
 			AlarmScheduler.ScheduleReminder(reminderId, next, reminder.Name);
 		}
 		catch

@@ -21,6 +21,13 @@ public class BootReceiver : BroadcastReceiver
 			var reminders = await repo.GetAll();
 			foreach (var r in reminders)
 			{
+				var nextDue = r.NextTrigger;
+				if (!r.IsTaken && DateTime.Now >= nextDue)
+				{
+					AlarmScheduler.ScheduleFollowUp(r.Id, DateTime.Now.AddMinutes(10), r.Name);
+					continue;
+				}
+
 				var next = medicine_tracker.Services.ReminderScheduler.ComputeNextTrigger(r);
 				await repo.UpdateNextTrigger(r.Id, next);
 				AlarmScheduler.ScheduleReminder(r.Id, next, r.Name);

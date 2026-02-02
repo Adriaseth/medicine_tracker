@@ -106,5 +106,11 @@ namespace medicine_tracker.Services
 				"UPDATE Reminder SET FollowUpCount = FollowUpCount + 1 WHERE Id = ?",
 				id);
 		}
+
+		public async Task Delete(int id)
+		{
+			await Init();
+			await _db.ExecuteAsync("DELETE FROM Reminder WHERE Id = ?", id);
+		}
 	}
 }

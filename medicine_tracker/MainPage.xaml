@@ -36,20 +36,34 @@
 				SelectionMode="None">
 				<CollectionView.ItemTemplate>
 					<DataTemplate>
-						<Frame
-							Padding="14"
-							Margin="0,0,0,12"
-							CornerRadius="16"
-							HasShadow="False"
-							BorderColor="{AppThemeBinding Light=#C8C8C8, Dark=#404040}"
-							BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#111827}">
-							<Frame.Triggers>
-								<DataTrigger TargetType="Frame" Binding="{Binding IsTaken}" Value="True">
-									<Setter Property="BorderColor" Value="#16A34A" />
-									<Setter Property="BackgroundColor" Value="#DCFCE7" />
-								</DataTrigger>
-							</Frame.Triggers>
-							<Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto" ColumnSpacing="12">
+						<SwipeView>
+							<SwipeView.RightItems>
+								<SwipeItems Mode="Reveal">
+									<SwipeItem
+										Text="Delete"
+										BackgroundColor="#DC2626"
+										Invoked="OnDeleteInvoked"
+										CommandParameter="{Binding .}" />
+								</SwipeItems>
+							</SwipeView.RightItems>
+
+							<Frame
+								Padding="14"
+								Margin="0,0,0,12"
+								CornerRadius="16"
+								HasShadow="False"
+								BorderColor="{AppThemeBinding Light=#C8C8C8, Dark=#404040}"
+								BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#111827}">
+								<Frame.GestureRecognizers>
+									<TapGestureRecognizer Tapped="OnReminderTapped" CommandParameter="{Binding .}" />
+								</Frame.GestureRecognizers>
+								<Frame.Triggers>
+									<DataTrigger TargetType="Frame" Binding="{Binding IsTaken}" Value="True">
+										<Setter Property="BorderColor" Value="#16A34A" />
+										<Setter Property="BackgroundColor" Value="#DCFCE7" />
+									</DataTrigger>
+								</Frame.Triggers>
+								<Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto" ColumnSpacing="12">
 								<Frame
 									Grid.RowSpan="2"
 									Padding="0"
@@ -79,6 +93,7 @@
 									FontSize="13" />
 							</Grid>
 						</Frame>
+						</SwipeView>
 					</DataTemplate>
 				</CollectionView.ItemTemplate>
 			</CollectionView>
